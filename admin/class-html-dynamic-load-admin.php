@@ -4,7 +4,7 @@
  * The admin-specific functionality of the plugin.
  *
  * @link       https://www.linkedin.com/in/mateus-nobre-de-oliveira-23a29b12b/
- * @since      0.0.1
+ * @since      1.0.0
  *
  * @package    Html_Dynamic_Load
  * @subpackage Html_Dynamic_Load/admin
@@ -22,82 +22,124 @@
  */
 class Html_Dynamic_Load_Admin {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    0.0.1
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
-	private $plugin_name;
+    /**
+     * The ID of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $plugin_name    The ID of this plugin.
+     */
+    private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    0.0.1
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
-	private $version;
+    /**
+     * The version of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $version    The current version of this plugin.
+     */
+    private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    0.0.1
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
-	public function __construct( $plugin_name, $version ) {
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since    1.0.0
+     * @param      string    $plugin_name       The name of this plugin.
+     * @param      string    $version    The version of this plugin.
+     */
+    public function __construct( $plugin_name, $version ) {
 
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
 
-	}
+        $this->define_admin_hooks();
+    }
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    0.0.1
-	 */
-	public function enqueue_styles() {
+    /**
+     * Register all of the hooks related to the admin area functionality
+     * of the plugin.
+     */
+    private function define_admin_hooks() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Html_Dynamic_Load_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Html_Dynamic_Load_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_styles'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_scripts'));
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/html-dynamic-load-admin.css', array(), $this->version, 'all' );
+        // Adiciona a página de opções ao menu administrativo
+        add_action('admin_menu', array($this, 'add_admin_menu'));
 
-	}
+        // Inicializa as configurações da página de opções
+        add_action('admin_init', array($this, 'settings_init'));
+    }
 
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    0.0.1
-	 */
-	public function enqueue_scripts() {
+    /**
+     * Register the stylesheets for the admin area.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_styles() {
+        wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/html-dynamic-load-admin.css', array(), $this->version, 'all');
+    }
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Html_Dynamic_Load_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Html_Dynamic_Load_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+    /**
+     * Register the JavaScript for the admin area.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_scripts() {
+        wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/html-dynamic-load-admin.js', array('jquery'), $this->version, false);
+    }
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/html-dynamic-load-admin.js', array( 'jquery' ), $this->version, false );
+    public function add_admin_menu() {
+        add_menu_page(
+            'HTML Dynamic Load Settings',
+            'HTML Dynamic Load',
+            'manage_options',
+            'html-dynamic-load',
+            array($this, 'settings_page')
+        );
+    }
 
-	}
+    public function settings_init() {
+        register_setting('htmlDynamicLoad', 'html_dynamic_load_settings');
+
+        add_settings_section(
+            'html_dynamic_load_html_dynamic_load_section',
+            __('Plugin de carregamento dinamico de conteúdo com base no scroll da página. Plugin de performance.', 'html-dynamic-load'),
+            array($this, 'settings_section_callback'),
+            'htmlDynamicLoad'
+        );
+
+        add_settings_field(
+            'html_dynamic_load_text_field_0',
+            __('Título da Publicação', 'html-dynamic-load'),
+            array($this, 'text_field_0_render'),
+            'htmlDynamicLoad',
+            'html_dynamic_load_html_dynamic_load_section'
+        );
+    }
+
+    public function text_field_0_render() {
+        $options = get_option('html_dynamic_load_settings');
+        ?>
+        <input type='text' name='html_dynamic_load_settings[html_dynamic_load_text_field_0]' value='<?php echo esc_attr($options); ?>'>
+        <?php
+    }
+
+    public function settings_section_callback() {
+        echo __('Configure como o plugin deve se comportar.', 'html-dynamic-load');
+    }
+
+    public function settings_page() {
+        ?>
+        <form action='options.php' method='post'>
+            <h2>HTML Dynamic Load</h2>
+            <?php
+            settings_fields('htmlDynamicLoad');
+            do_settings_sections('htmlDynamicLoad');
+            submit_button();
+            ?>
+        </form>
+        <?php
+    }
 
 }
