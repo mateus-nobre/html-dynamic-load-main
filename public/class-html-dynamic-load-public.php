@@ -93,8 +93,10 @@ class Html_Dynamic_Load_Public {
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/html-dynamic-load-public.js', array( 'jquery' ), $this->version, false );
+		 wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/html-dynamic-load-public.js', array( 'jquery' ), $this->version, true );
 
+		 $options = get_option('html_dynamic_load_settings');
+	 
+		 wp_localize_script( $this->plugin_name, 'dadosHtmlDynamicLoad', $options );
 	}
-
 }

@@ -4,7 +4,7 @@
  * The admin-specific functionality of the plugin.
  *
  * @link       https://www.linkedin.com/in/mateus-nobre-de-oliveira-23a29b12b/
- * @since      1.0.0
+ * @since      0.0.1
  *
  * @package    Html_Dynamic_Load
  * @subpackage Html_Dynamic_Load/admin
@@ -25,7 +25,7 @@ class Html_Dynamic_Load_Admin {
     /**
      * The ID of this plugin.
      *
-     * @since    1.0.0
+     * @since    0.0.1
      * @access   private
      * @var      string    $plugin_name    The ID of this plugin.
      */
@@ -34,7 +34,7 @@ class Html_Dynamic_Load_Admin {
     /**
      * The version of this plugin.
      *
-     * @since    1.0.0
+     * @since    0.0.1
      * @access   private
      * @var      string    $version    The current version of this plugin.
      */
@@ -43,7 +43,7 @@ class Html_Dynamic_Load_Admin {
     /**
      * Initialize the class and set its properties.
      *
-     * @since    1.0.0
+     * @since    0.0.1
      * @param      string    $plugin_name       The name of this plugin.
      * @param      string    $version    The version of this plugin.
      */
@@ -74,7 +74,7 @@ class Html_Dynamic_Load_Admin {
     /**
      * Register the stylesheets for the admin area.
      *
-     * @since    1.0.0
+     * @since    0.0.1
      */
     public function enqueue_styles() {
         wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/html-dynamic-load-admin.css', array(), $this->version, 'all');
@@ -83,47 +83,135 @@ class Html_Dynamic_Load_Admin {
     /**
      * Register the JavaScript for the admin area.
      *
-     * @since    1.0.0
+     * @since    0.0.1
      */
     public function enqueue_scripts() {
         wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/html-dynamic-load-admin.js', array('jquery'), $this->version, false);
     }
 
     public function add_admin_menu() {
+        // Obtém a URL base do diretório do seu plugin e concatena o caminho para o ícone SVG
+        $icon_url = plugin_dir_url(__FILE__) . 'assets/icons/html-dynamic-load.svg';
+    
         add_menu_page(
             'HTML Dynamic Load Settings',
-            'HTML Dynamic Load',
+            'HTML D. Load',
             'manage_options',
             'html-dynamic-load',
-            array($this, 'settings_page')
+            array($this, 'settings_page'),
+            $icon_url
         );
     }
+    
+    
 
     public function settings_init() {
         register_setting('htmlDynamicLoad', 'html_dynamic_load_settings');
 
         add_settings_section(
             'html_dynamic_load_html_dynamic_load_section',
-            __('Plugin de carregamento dinamico de conteúdo com base no scroll da página. Plugin de performance.', 'html-dynamic-load'),
+            __('Plugin de carregamento dinamico de conteúdo com base no scroll da página.', 'html-dynamic-load'),
             array($this, 'settings_section_callback'),
             'htmlDynamicLoad'
         );
 
         add_settings_field(
-            'html_dynamic_load_text_field_0',
+            'class_name_lazy',
             __('Título da Publicação', 'html-dynamic-load'),
-            array($this, 'text_field_0_render'),
+            array($this, 'class_name_lazy'),
+            'htmlDynamicLoad',
+            'html_dynamic_load_html_dynamic_load_section'
+        );
+
+        add_settings_field(
+            'mobile_sections_started',
+            __('Seções exibidas inicialmente - Mobile', 'html-dynamic-load'),
+            array($this, 'mobile_sections_started'),
+            'htmlDynamicLoad',
+            'html_dynamic_load_html_dynamic_load_section'
+        );
+
+        add_settings_field(
+            'tablet_sections_started',
+            __('Seções exibidas inicialmente - Tablet', 'html-dynamic-load'),
+            array($this, 'tablet_sections_started'),
+            'htmlDynamicLoad',
+            'html_dynamic_load_html_dynamic_load_section'
+        );
+
+        add_settings_field(
+            'desktop_sections_started',
+            __('Seções exibidas inicialmente - Desktop', 'html-dynamic-load'),
+            array($this, 'desktop_sections_started'),
             'htmlDynamicLoad',
             'html_dynamic_load_html_dynamic_load_section'
         );
     }
 
-    public function text_field_0_render() {
+    public function class_name_lazy() {
         $options = get_option('html_dynamic_load_settings');
+        // Acessa especificamente o valor de 'class_name_lazy' dentro do array de opções
+        $value = '';
+        if (isset($options['class_name_lazy'])) {
+            $value = esc_attr($options['class_name_lazy']);
+        }
         ?>
-        <input type='text' name='html_dynamic_load_settings[html_dynamic_load_text_field_0]' value='<?php echo esc_attr($options); ?>'>
+        <div>Defina a classe que o HTML Dynamic Load usará para mapear o conteúdo. Clique (aqui) para visualizar exemplo. <br/>
+        <span class="lazy-admin-observ">Caso nenhuma seja definida, o item default é: ".lazy-html".</span>
+        </div>
+        <input type='text' name='html_dynamic_load_settings[class_name_lazy]' value='<?php echo $value; ?>'>
+        <hr/>
         <?php
     }
+
+    public function mobile_sections_started() {
+        $options = get_option('html_dynamic_load_settings');
+        // Acessa especificamente o valor de 'mobile_sections_started' dentro do array de opções
+        $value = '';
+        if (isset($options['mobile_sections_started'])) {
+            $value = esc_attr($options['mobile_sections_started']);
+        }
+        ?>
+        <div>Para que o plugin funcione corretamente, cite aqui quantas sections devem já ser apresentadas no primeiro load (demais seções devem ter lazy load aplicado.)<br/>
+            <span class="lazy-admin-observ"> Regra mobile.</span>
+        </div>
+        <input type='text' name='html_dynamic_load_settings[mobile_sections_started]' value='<?php echo $value; ?>'>
+        <hr/>
+        <?php
+    }
+
+    public function tablet_sections_started() {
+        $options = get_option('html_dynamic_load_settings');
+        // Acessa especificamente o valor de 'tablet_sections_started' dentro do array de opções
+        $value = '';
+        if (isset($options['tablet_sections_started'])) {
+            $value = esc_attr($options['tablet_sections_started']);
+        }
+        ?>
+        <div>Para que o plugin funcione corretamente, cite aqui quantas sections devem já ser apresentadas no primeiro load (demais seções devem ter lazy load aplicado.)<br/>
+            <span class="lazy-admin-observ"> Regra Tablet.</span>
+        </div>
+        <input type='text' name='html_dynamic_load_settings[tablet_sections_started]' value='<?php echo $value; ?>'>
+        <hr/>
+        <?php
+    }
+
+    public function desktop_sections_started() {
+        $options = get_option('html_dynamic_load_settings');
+        // Acessa especificamente o valor de 'desktop_sections_started' dentro do array de opções
+        $value = '';
+        if (isset($options['desktop_sections_started'])) {
+            $value = esc_attr($options['desktop_sections_started']);
+        }
+        ?>
+        <div>Para que o plugin funcione corretamente, cite aqui quantas sections devem ser apresentadas no primeiro load (demais seções devem ter lazy load aplicado.)<br/>
+            <span class="lazy-admin-observ"> Regra Desktop.</span>
+        </div>
+        <input type='text' name='html_dynamic_load_settings[desktop_sections_started]' value='<?php echo $value; ?>'>
+        <hr/>
+        <?php
+    }
+    
 
     public function settings_section_callback() {
         echo __('Configure como o plugin deve se comportar.', 'html-dynamic-load');
@@ -131,8 +219,9 @@ class Html_Dynamic_Load_Admin {
 
     public function settings_page() {
         ?>
-        <form action='options.php' method='post'>
-            <h2>HTML Dynamic Load</h2>
+        <form class="lazy-html-admin-form" action='options.php' method='post'>
+            <h2 class="lazy-html-admin-title">HTML Dynamic Load</h2>
+            <hr/>
             <?php
             settings_fields('htmlDynamicLoad');
             do_settings_sections('htmlDynamicLoad');
@@ -141,5 +230,4 @@ class Html_Dynamic_Load_Admin {
         </form>
         <?php
     }
-
 }

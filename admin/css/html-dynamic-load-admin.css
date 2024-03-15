@@ -1,4 +1,67 @@
-/**
- * All of the CSS for your admin-specific functionality should be
- * included in this file.
- */
+.toplevel_page_html-dynamic-load img{
+    width: 23px;
+}
+
+.lazy-html-admin-form{
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.lazy-html-admin-form .form-table th{
+    width: 95%;
+    max-width: 450px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #63594d;
+    margin: 15px 5px;
+}
+
+.lazy-html-admin-form table tbody tr{
+    display:flex;
+    flex-direction:column;
+    width:95%;
+    max-width: 450px;
+}
+
+h2.lazy-html-admin-title{
+    font-size: 33px;
+    color: #604848;
+}
+
+.lazy-html-admin-form table tbody tr th{
+    padding: 0;
+}
+
+.lazy-html-admin-form table tbody tr td{
+    padding: 0;
+}
+
+.lazy-html-admin-form td div{
+    margin: 0 5px;
+}
+
+.lazy-html-admin-form td input{
+    width: 95%;
+    height: 36px;
+    margin: 15px 5px;
+    font-weight: 600;
+    color: gray;
+    border: 2px solid #63594d;
+    border-radius: 6px;
+}
+
+.lazy-html-admin-form .button.button-primary{
+    border: 2px #63594d solid;
+    background: transparent;
+    color: #63594d;
+    font-weight: 600;
+    border-radius: 30px;
+    padding: 7px 20px;
+    margin: 5px;
+    display:flex;
+}
+
+.lazy-admin-observ{
+    font-weight: 600;
+    color: gray;
+}
